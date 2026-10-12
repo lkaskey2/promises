@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Our Promises</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+html{-webkit-text-size-adjust:100%}body{margin:0}[hidden]{display:none!important}
+:root{
+  --ground:#F5F3F7; --surface:#FFFFFF; --ink:#241F2B; --muted:#6C6475; --line:#E4DFEA;
+  --accent:#7E3656; --accent-soft:#F3E6EC; --liz:#2F6E6A; --liz-soft:#E2F0EE;
+  --ok:#2F6E3E; --warn:#8A5A12;
+  --display:"Gloock",Georgia,"Times New Roman",serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#16121A; --surface:#211B26; --ink:#EEE8F1; --muted:#A79FB0; --line:#342C3B;
+    --accent:#E48FB2; --accent-soft:#3A2430; --liz:#7CC6BF; --liz-soft:#1E3533;
+    --ok:#8FD3A0; --warn:#E6B865;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#16121A; --surface:#211B26; --ink:#EEE8F1; --muted:#A79FB0; --line:#342C3B;
+  --accent:#E48FB2; --accent-soft:#3A2430; --liz:#7CC6BF; --liz-soft:#1E3533;
+  --ok:#8FD3A0; --warn:#E6B865;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:720px;margin:0 auto}
+header{padding-block:40px 20px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(34px,7vw,48px);line-height:1.1;margin:6px 0 0;text-wrap:balance}
+h1 .amp{color:var(--accent)}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--ground);display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:28px;overflow-x:auto}
+nav button{font:inherit;font-weight:600;font-size:15px;background:none;border:0;color:var(--muted);padding:12px 12px 10px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+nav button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+nav button:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h2{font-family:var(--display);font-weight:400;font-size:28px;margin:0 0 6px;text-wrap:balance}
+h3{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:28px 0 10px;font-weight:700}
+.lede{color:var(--muted);margin:0 0 20px;max-width:60ch}
+ol.promises{list-style:none;margin:0;padding:0;counter-reset:p;display:grid;gap:0}
+.cols{display:grid;grid-template-columns:44px 1fr 1fr;gap:0 20px;padding-bottom:8px}
+.cols span{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.cols span:first-child{grid-column:2}
+ol.promises li{counter-increment:p;display:grid;grid-template-columns:44px 1fr 1fr;gap:4px 20px;padding:16px 0;border-top:1px solid var(--line)}
+ol.promises li:last-child{border-bottom:1px solid var(--line)}
+ol.promises li::before{content:counter(p);font-family:var(--display);font-size:26px;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums;padding-top:2px}
+ol.promises b{display:block;font-weight:700}
+ol.promises span{color:var(--muted)}
+ol.promises .fix{background:var(--accent-soft);border-radius:8px;padding:10px 12px;font-size:15px;align-self:start}
+ol.promises .fix::before{content:"If it slips";display:none;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--accent);margin-bottom:2px}
+@media (max-width:640px){
+  .cols{display:none}
+  ol.promises li{grid-template-columns:44px 1fr}
+  ol.promises .fix{grid-column:2}
+  ol.promises .fix::before{display:block}
+}
+.when{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.chip{background:var(--accent-soft);color:var(--accent);font-weight:600;font-size:14px;padding:6px 12px;border-radius:999px}
+ul.plain{margin:0;padding-left:20px;display:grid;gap:6px}
+ol.steps{margin:0;padding-left:22px;display:grid;gap:10px}
+.formula{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:grid;gap:6px}
+.formula .q{font-style:italic}
+.formula .k{font-weight:700;color:var(--accent)}
+.sources{display:grid;gap:6px;padding-left:20px;margin:0}
+a{color:var(--accent)}
+.muted{color:var(--muted)}
+/* board */
+.who{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--surface)}
+.who button{font:inherit;font-weight:600;font-size:14px;border:0;background:none;color:var(--muted);padding:6px 16px;border-radius:999px;cursor:pointer}
+.who button[aria-pressed="true"][data-who="Larry"]{background:var(--accent-soft);color:var(--accent)}
+.who button[aria-pressed="true"][data-who="Liz"]{background:var(--liz-soft);color:var(--liz)}
+form.compose{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:12px;margin-top:14px}
+label{font-size:13px;font-weight:600;color:var(--muted);display:grid;gap:6px}
+input,textarea{font:inherit;color:var(--ink);background:var(--ground);border:1px solid var(--line);border-radius:8px;padding:10px 12px;width:100%}
+textarea{min-height:120px;resize:vertical}
+input,textarea,select{font-weight:400;font-size:16px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.btn{font:inherit;font-weight:700;background:var(--accent);color:var(--surface);border:0;border-radius:8px;padding:10px 18px;cursor:pointer}
+.btn[disabled]{opacity:.5;cursor:default}
+.btn.ghost{background:none;color:var(--accent);border:1px solid var(--line)}
+.status{font-size:14px;min-height:1.4em}
+.status.ok{color:var(--ok)} .status.warn{color:var(--warn)}
+.feed{display:grid;gap:14px;margin-top:22px}
+.post{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.post header{padding:0;display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;justify-content:space-between;margin-bottom:6px}
+.tag{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:999px}
+.tag.Larry{background:var(--accent-soft);color:var(--accent)}
+.tag.Liz{background:var(--liz-soft);color:var(--liz)}
+.post h4{font-family:var(--display);font-weight:400;font-size:22px;margin:4px 0 6px}
+.post p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.date{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+details.alerts{margin-top:18px;border:1px solid var(--line);border-radius:12px;padding:12px 16px;background:var(--surface)}
+details.alerts summary{cursor:pointer;font-weight:600}
+details.alerts .grid{display:grid;gap:12px;margin-top:12px}
+.empty{color:var(--muted);text-align:center;padding:28px 0;border:1px dashed var(--line);border-radius:12px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+select{font:inherit;color:var(--ink);background:var(--ground);border:1px solid var(--line);border-radius:8px;padding:10px 12px;width:100%}
+.tag.type{background:var(--line);color:var(--ink)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Larry &amp; Liz</div>
+    <h1>What we promise each other <span class="amp">&amp;</span> how we talk</h1>
+  </header>
+
+  <nav role="tablist" aria-label="Sections">
+    <button role="tab" id="tab-promises" data-tab="promises" aria-selected="true">Our Promises</button>
+    <button role="tab" id="tab-sotu" data-tab="sotu" aria-selected="false">State of the Union</button>
+    <button role="tab" id="tab-board" data-tab="board" aria-selected="false">Our Board</button>
+  </nav>
+
+  <section id="promises" role="tabpanel" aria-labelledby="tab-promises">
+    <h2>Our Promises</h2>
+    <p class="lede">Things we strive for, every day.</p>
+    <div class="cols" aria-hidden="true"><span>The promise</span><span>If it slips</span></div>
+    <ol class="promises">
+      <li><div><b>Assume love.</b><span>Whatever we hear from each other, whatever the tone or words, it comes from love.</span></div><div class="fix">Ask, don't assume: “Can I check what you meant?” The other answers plainly.</div></li>
+      <li><div><b>No relitigating.</b><span>We raise things without dragging up old arguments or hurts.</span></div><div class="fix">Either of us can say “That's from before.” We come back to the current topic.</div></li>
+      <li><div><b>Think positively.</b><span>We choose positive thoughts about each other and about us, every day.</span></div><div class="fix">Tell the other one specific thing you appreciate about them that day.</div></li>
+      <li><div><b>Keep the spark.</b><span>We each plan dates and special moments, at least monthly.</span></div><div class="fix">Whoever missed their month plans the next date within two weeks.</div></li>
+      <li><div><b>State of the Union.</b><span>Wednesdays at 9 PM, 15–30 minutes, to talk through the past week.</span></div><div class="fix">Reschedule within 48 hours. We never skip two weeks in a row.</div></li>
+      <li><div><b>Keep merging.</b><span>We're building one life together, emotionally and financially, with no deadline.</span></div><div class="fix">Raise it at the next State of the Union with a soft start.</div></li>
+      <li><div><b>Bookend the day.</b><span>Good morning and good night texts, daily.</span></div><div class="fix">Send a quick “missed you” text as soon as you notice. No guilt either way.</div></li>
+      <li><div><b>Say it sweetly.</b><span>BABE, amor, love: often.</span></div><div class="fix">A light reminder is fine: “Call me BABE.” Taken with a smile.</div></li>
+      <li><div><b>Us first.</b><span>We're each other's default priority, with understood exceptions.</span></div><div class="fix">The one who stepped away acknowledges it. If it repeats, it goes to State of the Union.</div></li>
+      <li><div><b>Kid time matters.</b><span>We help each other make the most of time with our kids as they continue to build their own lives.</span></div><div class="fix">A quick reminder that we're just trying to make the most of this time.</div></li>
+      <li><div><b>Freedom to go.</b><span>Liz can visit her kids or do any activities with her kids without guilt. Larry can do the same. Period.</span></div><div class="fix">If guilt shows up, either of us says “Promise 11,” and we let it go.</div></li>
+      <li><div><b>Travel together.</b><span>One 5+ day vacation a year, minimum.</span></div><div class="fix">Put dates on the calendar together within a month.</div></li>
+      <li><div><b>Heart before head.</b><span>Compassion and empathy come before being right, fixing, or blaming.</span></div><div class="fix">Pause and say “Let me start over.” Lead with empathy the second time.</div></li>
+      <li><div><b>De-escalate.</b><span>We keep finding ways to cool things down. An apology isn't admitting blame. It's a good way to start.</span></div><div class="fix">Take at least a 20-minute break, then come back. Either of us can apologize first.</div></li>
+      <li><div><b>One topic at a time.</b><span>When one of us raises something, the other responds to that, not with “you did it too.” If you have your own concern, it gets its own turn.</span></div><div class="fix">Either of us says “One at a time.” The other concern waits for its own turn, usually at State of the Union.</div></li>
+    </ol>
+  </section>
+
+  <section id="sotu" role="tabpanel" aria-labelledby="tab-sotu" hidden>
+    <h2>State of the Union</h2>
+    <div class="when"><span class="chip">Wednesdays · 9 PM</span><span class="chip">15–30 minutes</span></div>
+    <p class="lede">If one of us is away, we do it by phone or video.</p>
+
+    <h3>Rules</h3>
+    <ul class="plain">
+      <li>Only the past week counts.</li>
+      <li>Phones down.</li>
+      <li>We take turns speaking and listening.</li>
+    </ul>
+
+    <h3>Agenda</h3>
+    <ol class="steps">
+      <li><b>One issue each.</b> The Speaker shares how they feel, without placing blame. The Listener tries to understand, not defend.</li>
+      <li><b>One wish each.</b> “One thing that would help me feel loved this week is…” Be specific, and ask for more of something rather than for someone to stop something.</li>
+    </ol>
+
+    <h3>Soft start</h3>
+    <div class="formula">
+      <div class="q">“I just want to tell you how I feel, not place blame.”</div>
+      <div><span class="k">I feel</span> [emotion]</div>
+      <div><span class="k">about</span> [a specific situation]</div>
+      <div><span class="k">I need</span> [something positive]</div>
+      <div class="q">“What do you think?”</div>
+    </div>
+    <p class="muted" style="margin-top:12px">Keep it a complaint, not criticism: no “you always,” “you never,” or attacks on character.</p>
+
+    <h3>Listening</h3>
+    <ul class="plain">
+      <li>Two different views can both be valid.</li>
+      <li>Respond with empathy.</li>
+      <li>Don't answer an issue with one of your own.</li>
+    </ul>
+
+    <h3>Sources</h3>
+    <ul class="sources">
+      <li><a href="https://www.gottman.com/blog/how-to-have-a-state-of-the-union-meeting/" target="_blank" rel="noopener">Gottman Institute – State of the Union Meeting</a></li>
+      <li><a href="https://www.cityscapecounseling.com/post/state-of-the-union/" target="_blank" rel="noopener">Cityscape Counseling – Weekly Routine</a></li>
+      <li><a href="https://couplestherapyinc.com/softened-start-up-gottmans-way-to-gentle-beginnings/" target="_blank" rel="noopener">Couples Therapy Inc. – Softened Start-Up</a></li>
+      <li><a href="https://www.insightscc.com/blog/criticism-when-complaints-turn-into-attacksand-how-to-start-up-gently" target="_blank" rel="noopener">Insights Counseling – Criticism vs. Complaints</a></li>
+      <li><a href="https://www.asytner.com/the-gottman-soft-startup-how-to-begin-a-difficult-conversation-without-starting-a-fight/" target="_blank" rel="noopener">Dr. Ari Sytner – Soft Startup</a></li>
+    </ul>
+  </section>
+
+  <section id="board" role="tabpanel" aria-labelledby="tab-board" hidden>
+    <h2>Our Board</h2>
+    <p class="lede">A place for each of us to share notes and check-in summaries. The other person gets an email when something new is posted.</p>
+
+    <form class="compose" id="unlock">
+      <label for="passcode">Passcode
+        <input id="passcode" type="password" autocomplete="current-password" placeholder="The word we chose" required>
+      </label>
+      <div class="row">
+        <div class="status" id="unlock-status" role="status"></div>
+        <button class="btn" type="submit">Open board</button>
+      </div>
+    </form>
+
+    <div id="board-open" hidden>
+      <div class="row">
+        <div class="who" role="group" aria-label="Posting as">
+          <button type="button" data-who="Larry" aria-pressed="true">Larry</button>
+          <button type="button" data-who="Liz" aria-pressed="false">Liz</button>
+        </div>
+        <button class="btn ghost" id="lock" type="button">Lock</button>
+      </div>
+
+      <form class="compose" id="compose">
+        <label for="post-type">Type
+          <select id="post-type">
+            <option>Note</option>
+            <option>Check-in summary</option>
+          </select>
+        </label>
+        <label for="post-title">Title
+          <input id="post-title" maxlength="140" placeholder="A thought for this week" required>
+        </label>
+        <label for="post-body">Message
+          <textarea id="post-body" maxlength="20000" placeholder="Write it here…" required></textarea>
+        </label>
+        <div class="row">
+          <div class="status" id="post-status" role="status"></div>
+          <button class="btn" id="post-btn" type="submit">Post as Larry</button>
+        </div>
+      </form>
+
+      <div class="feed" id="feed"><div class="empty">Loading posts…</div></div>
+    </div>
+  </section>
+</div>
+
+<script>
+// ===== Paste your Apps Script web app URL here =====
+const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s9I7eEjvrUE2vcadP7xrj2Zf8qVSu4IyuTPir5jVUgU6i/exec';
+
+(function(){
+  // tabs
+  const tabs=[...document.querySelectorAll('nav [role=tab]')];
+  function show(id){tabs.forEach(t=>{const on=t.dataset.tab===id;t.setAttribute('aria-selected',on);document.getElementById(t.dataset.tab).hidden=!on;});}
+  tabs.forEach(t=>t.addEventListener('click',()=>{show(t.dataset.tab);try{history.replaceState(null,'','#'+t.dataset.tab);}catch(e){}}));
+  const h=(location.hash||'').slice(1);
+  show(['promises','sotu','board'].includes(h)?h:'promises');
+
+  // storage helpers
+  const get=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+  const put=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}};
+
+  const $=id=>document.getElementById(id);
+  function status(el,msg,kind){el.textContent=msg;el.className='status'+(kind?' '+kind:'');}
+  const fmt=new Intl.DateTimeFormat(undefined,{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+
+  // who
+  let me=get('who')==='Liz'?'Liz':'Larry';
+  const whoBtns=[...document.querySelectorAll('.who button')];
+  function setWho(w){me=w;whoBtns.forEach(b=>b.setAttribute('aria-pressed',b.dataset.who===w));$('post-btn').textContent='Post as '+w;put('who',w);}
+  whoBtns.forEach(b=>b.addEventListener('click',()=>setWho(b.dataset.who)));
+  setWho(me);
+
+  let code=get('code');
+
+  function render(posts){
+    const feed=$('feed');feed.textContent='';
+    if(!posts.length){const d=document.createElement('div');d.className='empty';d.textContent='Nothing posted yet. The first note is yours to write.';feed.append(d);return;}
+    for(const p of posts){
+      const art=document.createElement('article');art.className='post';
+      const hd=document.createElement('header');
+      const tags=document.createElement('div');tags.className='tags';
+      const a=p.author==='Liz'?'Liz':'Larry';
+      const t1=document.createElement('span');t1.className='tag '+a;t1.textContent=a;tags.append(t1);
+      if(p.type==='Check-in summary'){const t2=document.createElement('span');t2.className='tag type';t2.textContent='Check-in';tags.append(t2);}
+      const dt=document.createElement('span');dt.className='date';const w=new Date(p.date);dt.textContent=isNaN(w)?'':fmt.format(w);
+      hd.append(tags,dt);
+      const h4=document.createElement('h4');h4.textContent=p.title||'Untitled';
+      const b=document.createElement('p');b.textContent=p.body||'';
+      art.append(hd,h4,b);feed.append(art);
+    }
+  }
+
+  async function load(){
+    const r=await fetch(API_URL+'?action=list&code='+encodeURIComponent(code));
+    const j=await r.json();
+    if(!j.ok) throw new Error(j.error||'error');
+    render(j.posts||[]);
+  }
+
+  function openBoard(){ $('unlock').hidden=true; $('board-open').hidden=false; }
+  function lockBoard(){ code=null; put('code',null); $('board-open').hidden=true; $('unlock').hidden=false; $('passcode').value=''; }
+
+  async function tryOpen(c,quiet){
+    if(!API_URL||API_URL.startsWith('PASTE')){status($('unlock-status'),'The board isn’t connected yet. Paste the web app URL into this page.','warn');return;}
+    code=c; status($('unlock-status'),quiet?'':'Opening…');
+    try{ await load(); put('code',c); openBoard(); status($('unlock-status'),''); }
+    catch(e){
+      code=null; put('code',null);
+      status($('unlock-status'), e.message==='wrong_passcode'?'That passcode didn’t work.':'Couldn’t reach the board. Check your connection and try again.','warn');
+    }
+  }
+
+  $('unlock').addEventListener('submit',ev=>{ev.preventDefault();const c=$('passcode').value.trim();if(c)tryOpen(c);});
+  $('lock').addEventListener('click',lockBoard);
+  if(code) tryOpen(code,true);
+
+  $('compose').addEventListener('submit',async ev=>{
+    ev.preventDefault();
+    const title=$('post-title').value.trim(), body=$('post-body').value.trim(), type=$('post-type').value;
+    const ps=$('post-status'), btn=$('post-btn');
+    if(!title||!body){status(ps,'Add a title and a message first.','warn');return;}
+    btn.disabled=true;status(ps,'Posting…');
+    try{
+      const r=await fetch(API_URL,{method:'POST',body:JSON.stringify({code,author:me,type,title,body})});
+      const j=await r.json();
+      if(!j.ok){status(ps,j.error==='wrong_passcode'?'Passcode changed. Lock and open the board again.':'Couldn’t post. Try again.','warn');return;}
+      $('post-title').value='';$('post-body').value='';$('post-type').value='Note';
+      status(ps,j.emailed?'Posted. '+j.to+' has been emailed.':'Posted, but the email didn’t send.',j.emailed?'ok':'warn');
+      load().catch(()=>{});
+    }catch(e){status(ps,'Couldn’t reach the board. Check your connection; your text is still here.','warn');}
+    finally{btn.disabled=false;}
+  });
+})();
+</script>
+
+</body>
+</html>
