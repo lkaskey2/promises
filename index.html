@@ -191,23 +191,12 @@ select{font:inherit;color:var(--ink);background:var(--ground);border:1px solid v
     <h2>Our Board</h2>
     <p class="lede">A place for each of us to share notes and check-in summaries. The other person gets an email when something new is posted.</p>
 
-    <form class="compose" id="unlock">
-      <label for="passcode">Passcode
-        <input id="passcode" type="password" autocomplete="current-password" placeholder="The word we chose" required>
-      </label>
-      <div class="row">
-        <div class="status" id="unlock-status" role="status"></div>
-        <button class="btn" type="submit">Open board</button>
-      </div>
-    </form>
-
-    <div id="board-open" hidden>
+    <div id="board-open">
       <div class="row">
         <div class="who" role="group" aria-label="Posting as">
           <button type="button" data-who="Larry" aria-pressed="true">Larry</button>
           <button type="button" data-who="Liz" aria-pressed="false">Liz</button>
         </div>
-        <button class="btn ghost" id="lock" type="button">Lock</button>
       </div>
 
       <form class="compose" id="compose">
@@ -261,7 +250,6 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s
   whoBtns.forEach(b=>b.addEventListener('click',()=>setWho(b.dataset.who)));
   setWho(me);
 
-  let code=get('code');
 
   function render(posts){
     const feed=$('feed');feed.textContent='';
@@ -282,28 +270,15 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s
   }
 
   async function load(){
-    const r=await fetch(API_URL+'?action=list&code='+encodeURIComponent(code));
+    const r=await fetch(API_URL+'?action=list');
     const j=await r.json();
     if(!j.ok) throw new Error(j.error||'error');
     render(j.posts||[]);
   }
 
-  function openBoard(){ $('unlock').hidden=true; $('board-open').hidden=false; }
-  function lockBoard(){ code=null; put('code',null); $('board-open').hidden=true; $('unlock').hidden=false; $('passcode').value=''; }
-
-  async function tryOpen(c,quiet){
-    if(!API_URL||API_URL.startsWith('PASTE')){status($('unlock-status'),'The board isn’t connected yet. Paste the web app URL into this page.','warn');return;}
-    code=c; status($('unlock-status'),quiet?'':'Opening…');
-    try{ await load(); put('code',c); openBoard(); status($('unlock-status'),''); }
-    catch(e){
-      code=null; put('code',null);
-      status($('unlock-status'), e.message==='wrong_passcode'?'That passcode didn’t work.':'Couldn’t reach the board. Check your connection and try again.','warn');
-    }
-  }
-
-  $('unlock').addEventListener('submit',ev=>{ev.preventDefault();const c=$('passcode').value.trim();if(c)tryOpen(c);});
-  $('lock').addEventListener('click',lockBoard);
-  if(code) tryOpen(code,true);
+  function boardError(msg){const feed=$('feed');feed.textContent='';const d=document.createElement('div');d.className='empty';d.textContent=msg;feed.append(d);}
+  if(!API_URL||API_URL.startsWith('PASTE')) boardError('The board isn’t connected yet.');
+  else load().catch(()=>boardError('Couldn’t reach the board. Check your connection and reload the page.'));
 
   $('compose').addEventListener('submit',async ev=>{
     ev.preventDefault();
@@ -312,9 +287,9 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s
     if(!title||!body){status(ps,'Add a title and a message first.','warn');return;}
     btn.disabled=true;status(ps,'Posting…');
     try{
-      const r=await fetch(API_URL,{method:'POST',body:JSON.stringify({code,author:me,type,title,body})});
+      const r=await fetch(API_URL,{method:'POST',body:JSON.stringify({author:me,type,title,body})});
       const j=await r.json();
-      if(!j.ok){status(ps,j.error==='wrong_passcode'?'Passcode changed. Lock and open the board again.':'Couldn’t post. Try again.','warn');return;}
+      if(!j.ok){status(ps,'Couldn’t post. Try again.','warn');return;}
       $('post-title').value='';$('post-body').value='';$('post-type').value='Note';
       status(ps,j.emailed?'Posted. '+j.to+' has been emailed.':'Posted, but the email didn’t send.',j.emailed?'ok':'warn');
       load().catch(()=>{});
