@@ -103,6 +103,18 @@ details.alerts .grid{display:grid;gap:12px;margin-top:12px}
 select{font:inherit;color:var(--ink);background:var(--ground);border:1px solid var(--line);border-radius:8px;padding:10px 12px;width:100%}
 .tag.type{background:var(--line);color:var(--ink)}
 .tags{display:flex;gap:6px;flex-wrap:wrap}
+.post-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+.linkbtn{font:inherit;font-size:14px;font-weight:600;background:none;border:1px solid var(--line);color:var(--accent);border-radius:8px;padding:6px 12px;cursor:pointer}
+.linkbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.edit-form{display:grid;gap:10px;margin-top:6px}
+.edited{font-style:italic}
+.attachments{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-top:12px}
+.attachments a.photo{display:block;border-radius:8px;overflow:hidden;border:1px solid var(--line);background:var(--ground)}
+.attachments img{display:block;width:100%;max-width:100%;aspect-ratio:1/1;object-fit:cover}
+.attachments a.file{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;text-decoration:none;color:var(--ink);font-size:14px;overflow-wrap:anywhere}
+.attachments a.file::before{content:"📄";flex:none}
+.file-list{font-size:14px;color:var(--muted);display:grid;gap:2px}
+input[type=file]{padding:8px}
 </style>
 </head>
 <body>
@@ -212,6 +224,10 @@ select{font:inherit;color:var(--ink);background:var(--ground);border:1px solid v
         <label for="post-body">Message
           <textarea id="post-body" maxlength="20000" placeholder="Write it here…" required></textarea>
         </label>
+        <label for="post-files">Photos or files (optional)
+          <input id="post-files" type="file" multiple>
+        </label>
+        <div class="file-list" id="file-list"></div>
         <div class="row">
           <div class="status" id="post-status" role="status"></div>
           <button class="btn" id="post-btn" type="submit">Post as Larry</button>
@@ -246,28 +262,114 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s
   // who
   let me=get('who')==='Liz'?'Liz':'Larry';
   const whoBtns=[...document.querySelectorAll('.who button')];
-  function setWho(w){me=w;whoBtns.forEach(b=>b.setAttribute('aria-pressed',b.dataset.who===w));$('post-btn').textContent='Post as '+w;put('who',w);}
+  let posts=[];
+  function setWho(w){me=w;whoBtns.forEach(b=>b.setAttribute('aria-pressed',b.dataset.who===w));$('post-btn').textContent='Post as '+w;put('who',w);if(posts.length)render(posts);}
   whoBtns.forEach(b=>b.addEventListener('click',()=>setWho(b.dataset.who)));
   setWho(me);
 
 
-  function render(posts){
+  function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
+
+  function render(list){
+    posts=list;
     const feed=$('feed');feed.textContent='';
-    if(!posts.length){const d=document.createElement('div');d.className='empty';d.textContent='Nothing posted yet. The first note is yours to write.';feed.append(d);return;}
-    for(const p of posts){
-      const art=document.createElement('article');art.className='post';
-      const hd=document.createElement('header');
-      const tags=document.createElement('div');tags.className='tags';
+    if(!list.length){feed.append(el('div','empty','Nothing posted yet. The first note is yours to write.'));return;}
+    for(const p of list){
+      const art=el('article','post');
+      const hd=el('header');
+      const tags=el('div','tags');
       const a=p.author==='Liz'?'Liz':'Larry';
-      const t1=document.createElement('span');t1.className='tag '+a;t1.textContent=a;tags.append(t1);
-      if(p.type==='Check-in summary'){const t2=document.createElement('span');t2.className='tag type';t2.textContent='Check-in';tags.append(t2);}
-      const dt=document.createElement('span');dt.className='date';const w=new Date(p.date);dt.textContent=isNaN(w)?'':fmt.format(w);
+      tags.append(el('span','tag '+a,a));
+      if(p.type==='Check-in summary') tags.append(el('span','tag type','Check-in'));
+      const w=new Date(p.date);
+      const dt=el('span','date',isNaN(w)?'':fmt.format(w));
+      if(p.edited){dt.append(' · ');dt.append(el('span','edited','edited'));}
       hd.append(tags,dt);
-      const h4=document.createElement('h4');h4.textContent=p.title||'Untitled';
-      const b=document.createElement('p');b.textContent=p.body||'';
-      art.append(hd,h4,b);feed.append(art);
+      const h4=el('h4',null,p.title||'Untitled');
+      const b=el('p',null,p.body||'');
+      art.append(hd,h4,b);
+      if(Array.isArray(p.files)&&p.files.length) art.append(attachments(p.files));
+      if(p.id && a===me){
+        const actions=el('div','post-actions');
+        const eb=el('button','linkbtn','Edit');eb.type='button';
+        eb.addEventListener('click',()=>openEditor(art,p));
+        actions.append(eb);art.append(actions);
+      }
+      feed.append(art);
     }
   }
+
+  function openEditor(art,p){
+    const form=el('form','edit-form');
+    const tid='edit-title-'+p.id, bid='edit-body-'+p.id;
+    const tl=el('label',null,'Title');tl.htmlFor=tid;
+    const ti=el('input');ti.id=tid;ti.maxLength=140;ti.value=p.title||'';ti.required=true;tl.append(ti);
+    const bl=el('label',null,'Message');bl.htmlFor=bid;
+    const bi=el('textarea');bi.id=bid;bi.maxLength=20000;bi.value=p.body||'';bi.required=true;bl.append(bi);
+    const row=el('div','row');
+    const st=el('div','status');st.setAttribute('role','status');
+    const btns=el('div','post-actions');
+    const cancel=el('button','linkbtn','Cancel');cancel.type='button';
+    const save=el('button','btn','Save changes');save.type='submit';
+    btns.append(cancel,save);row.append(st,btns);
+    form.append(tl,bl,row);
+    // keep the header, replace the rest of the post with the editor
+    [...art.children].slice(1).forEach(c=>c.remove());
+    art.append(form);ti.focus();
+    cancel.addEventListener('click',()=>render(posts));
+    form.addEventListener('submit',async ev=>{
+      ev.preventDefault();
+      const title=ti.value.trim(), body=bi.value.trim();
+      if(!title||!body){status(st,'Add a title and a message.','warn');return;}
+      save.disabled=true;status(st,'Saving…');
+      try{
+        const r=await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'edit',id:p.id,author:me,title,body})});
+        const j=await r.json();
+        if(!j.ok){status(st,j.error==='not_author'?'Only the person who wrote this can edit it.':j.error==='not_found'?'This post no longer exists. Reload the page.':'Couldn’t save. Try again.','warn');save.disabled=false;return;}
+        status(st,'Saved.','ok');
+        load().catch(()=>render(posts));
+      }catch(e){status(st,'Couldn’t reach the board. Your changes are still here.','warn');save.disabled=false;}
+    });
+  }
+
+  const MAX_FILES=5, MAX_MB=10;
+  function attachments(files){
+    const box=el('div','attachments');
+    for(const f of files){
+      const view='https://drive.google.com/file/d/'+encodeURIComponent(f.id)+'/view';
+      if(String(f.type||'').startsWith('image/')){
+        const a=el('a','photo');a.href=view;a.target='_blank';a.rel='noopener';
+        const img=el('img');img.loading='lazy';img.alt=f.name||'Photo';
+        img.src='https://drive.google.com/thumbnail?id='+encodeURIComponent(f.id)+'&sz=w800';
+        a.append(img);box.append(a);
+      }else{
+        const a=el('a','file',f.name||'File');a.href=view;a.target='_blank';a.rel='noopener';box.append(a);
+      }
+    }
+    return box;
+  }
+  const b64=buf=>{let s='';const u=new Uint8Array(buf);for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s);};
+  // Photos are shrunk to 1600px (JPEG) before upload; other files go as-is.
+  async function prepFile(file){
+    if(/^image\/(jpeg|png|webp|heic|heif)$/i.test(file.type)){
+      try{
+        const bmp=await createImageBitmap(file);
+        const k=Math.min(1,1600/Math.max(bmp.width,bmp.height));
+        const c=document.createElement('canvas');c.width=Math.round(bmp.width*k);c.height=Math.round(bmp.height*k);
+        c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+        const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',0.85));
+        if(blob) return {name:file.name.replace(/\.[^.]+$/,'')+'.jpg',type:'image/jpeg',data:b64(await blob.arrayBuffer())};
+      }catch(e){/* fall through and send the original */}
+    }
+    if(file.size>MAX_MB*1024*1024) throw new Error(file.name+' is larger than '+MAX_MB+' MB.');
+    return {name:file.name,type:file.type||'application/octet-stream',data:b64(await file.arrayBuffer())};
+  }
+  $('post-files').addEventListener('change',()=>{
+    const fl=$('file-list');fl.textContent='';
+    const files=[...$('post-files').files];
+    if(files.length>MAX_FILES) fl.append(el('div',null,'Only the first '+MAX_FILES+' files will be attached.'));
+    files.slice(0,MAX_FILES).forEach(f=>fl.append(el('div',null,'• '+f.name+' ('+Math.max(1,Math.round(f.size/1024))+' KB)')));
+  });
 
   async function load(){
     const r=await fetch(API_URL+'?action=list');
@@ -285,12 +387,19 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s
     const title=$('post-title').value.trim(), body=$('post-body').value.trim(), type=$('post-type').value;
     const ps=$('post-status'), btn=$('post-btn');
     if(!title||!body){status(ps,'Add a title and a message first.','warn');return;}
-    btn.disabled=true;status(ps,'Posting…');
+    btn.disabled=true;
+    let files=[];
     try{
-      const r=await fetch(API_URL,{method:'POST',body:JSON.stringify({author:me,type,title,body})});
+      const picked=[...$('post-files').files].slice(0,MAX_FILES);
+      if(picked.length) status(ps,'Preparing '+picked.length+' file'+(picked.length>1?'s':'')+'…');
+      for(const f of picked) files.push(await prepFile(f));
+    }catch(e){status(ps,e.message||'Couldn’t read that file.','warn');btn.disabled=false;return;}
+    status(ps,files.length?'Uploading and posting…':'Posting…');
+    try{
+      const r=await fetch(API_URL,{method:'POST',body:JSON.stringify({author:me,type,title,body,files})});
       const j=await r.json();
-      if(!j.ok){status(ps,'Couldn’t post. Try again.','warn');return;}
-      $('post-title').value='';$('post-body').value='';$('post-type').value='Note';
+      if(!j.ok){status(ps,j.error==='file_error'?(j.message||'A file couldn’t be saved.'):'Couldn’t post. Try again.','warn');return;}
+      $('post-title').value='';$('post-body').value='';$('post-type').value='Note';$('post-files').value='';$('file-list').textContent='';
       status(ps,j.emailed?'Posted. '+j.to+' has been emailed.':'Posted, but the email didn’t send.',j.emailed?'ok':'warn');
       load().catch(()=>{});
     }catch(e){status(ps,'Couldn’t reach the board. Check your connection; your text is still here.','warn');}
