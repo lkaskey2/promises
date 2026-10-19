@@ -12,6 +12,7 @@ html{-webkit-text-size-adjust:100%}body{margin:0}[hidden]{display:none!important
   --ground:#F5F3F7; --surface:#FFFFFF; --ink:#241F2B; --muted:#6C6475; --line:#E4DFEA;
   --accent:#7E3656; --accent-soft:#F3E6EC; --liz:#2F6E6A; --liz-soft:#E2F0EE;
   --ok:#2F6E3E; --warn:#8A5A12;
+  --c-date:#B4532A; --c-family:#3D5A99;
   --display:"Gloock",Georgia,"Times New Roman",serif;
   --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
@@ -21,6 +22,7 @@ html{-webkit-text-size-adjust:100%}body{margin:0}[hidden]{display:none!important
     --ground:#16121A; --surface:#211B26; --ink:#EEE8F1; --muted:#A79FB0; --line:#342C3B;
     --accent:#E48FB2; --accent-soft:#3A2430; --liz:#7CC6BF; --liz-soft:#1E3533;
     --ok:#8FD3A0; --warn:#E6B865;
+    --c-date:#F0A27E; --c-family:#9DB4EE;
   }
 }
 :root[data-theme="dark"]{
@@ -28,6 +30,7 @@ html{-webkit-text-size-adjust:100%}body{margin:0}[hidden]{display:none!important
   --ground:#16121A; --surface:#211B26; --ink:#EEE8F1; --muted:#A79FB0; --line:#342C3B;
   --accent:#E48FB2; --accent-soft:#3A2430; --liz:#7CC6BF; --liz-soft:#1E3533;
   --ok:#8FD3A0; --warn:#E6B865;
+  --c-date:#F0A27E; --c-family:#9DB4EE;
 }
 *{box-sizing:border-box}
 body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;padding-inline:16px;padding-block:0 64px}
@@ -115,6 +118,49 @@ select{font:inherit;color:var(--ink);background:var(--ground);border:1px solid v
 .attachments a.file::before{content:"📄";flex:none}
 .file-list{font-size:14px;color:var(--muted);display:grid;gap:2px}
 input[type=file]{padding:8px}
+/* replies */
+.replies{margin-top:14px;border-top:1px solid var(--line);padding-top:10px;display:grid;gap:10px}
+.reply{display:grid;gap:4px;padding-left:12px;border-left:3px solid var(--line)}
+.reply.Larry{border-left-color:var(--accent)} .reply.Liz{border-left-color:var(--liz)}
+.reply-head{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.reply-head b{color:var(--ink);font-size:14px}
+.reply p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.replies>.linkbtn{justify-self:start}
+.reply .linkbtn{justify-self:start;padding:3px 10px;font-size:13px}
+.reply-form{display:grid;gap:8px}
+.reply-form textarea{min-height:80px}
+/* calendar */
+.cat-special{--c:var(--accent)} .cat-vacation{--c:var(--liz)} .cat-datenight{--c:var(--c-date)} .cat-family{--c:var(--c-family)} .cat-other{--c:var(--muted)}
+.cal-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0 10px}
+.cal-bar h3{margin:0;font-family:var(--display);font-weight:400;font-size:24px;letter-spacing:0;text-transform:none;color:var(--ink)}
+.cal-nav{display:flex;gap:6px}
+.cal-nav button{font:inherit;font-weight:600;background:var(--surface);border:1px solid var(--line);color:var(--ink);border-radius:8px;min-width:40px;padding:6px 10px;cursor:pointer}
+.cal-wrap{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px;overflow-x:auto}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(40px,1fr));gap:2px;min-width:300px}
+.cal .dow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:center;padding:4px 0;font-weight:700}
+.cal .day{font:inherit;text-align:left;background:none;border:0;border-radius:8px;min-height:62px;padding:4px;display:flex;flex-direction:column;gap:2px;cursor:pointer;color:var(--ink);overflow:hidden}
+.cal .day:hover{background:var(--ground)}
+.cal .day.out{color:var(--muted);opacity:.55}
+.cal .day .n{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;width:24px;height:24px;display:grid;place-items:center;border-radius:50%}
+.cal .day.today .n{background:var(--accent);color:var(--surface)}
+.cal .day.sel{outline:2px solid var(--accent);outline-offset:-2px}
+.cal .chip{display:block;font-size:11px;line-height:1.3;padding:1px 4px;border-radius:4px;background:color-mix(in srgb,var(--c) 20%,var(--surface));color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-left:3px solid var(--c)}
+.cal .more{font-size:11px;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:13px;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--c);margin-right:6px;vertical-align:-1px}
+.ev-list{display:grid;gap:8px}
+.ev{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:10px;padding:12px 14px}
+.ev .when{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;grid-column:1/-1}
+.ev .t{font-weight:700;grid-column:1/-1}
+.ev .meta{font-size:13px;color:var(--muted);grid-column:1/-1}
+.ev .notes{grid-column:1/-1;margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.ev .acts{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.ev .acts a{font-size:14px;font-weight:600;color:var(--accent);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:6px 12px}
+.countdown{font-weight:700;color:var(--c)}
+.checkrow{display:flex;align-items:center;gap:8px;font-size:15px;color:var(--ink);font-weight:500}
+.checkrow input{width:auto}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:480px){.grid2{grid-template-columns:1fr}.cal .day{min-height:52px}.cal .chip{font-size:10px}}
 </style>
 </head>
 <body>
@@ -129,6 +175,7 @@ input[type=file]{padding:8px}
     <button role="tab" id="tab-promises" data-tab="promises" aria-selected="true">Our Promises</button>
     <button role="tab" id="tab-sotu" data-tab="sotu" aria-selected="false">State of the Union</button>
     <button role="tab" id="tab-board" data-tab="board" aria-selected="false">Our Board</button>
+    <button role="tab" id="tab-calendar" data-tab="calendar" aria-selected="false">Calendar</button>
   </nav>
 
   <section id="promises" role="tabpanel" aria-labelledby="tab-promises">
@@ -237,6 +284,59 @@ input[type=file]{padding:8px}
       <div class="feed" id="feed"><div class="empty">Loading posts…</div></div>
     </div>
   </section>
+
+  <section id="calendar" role="tabpanel" aria-labelledby="tab-calendar" hidden>
+    <h2>Our Calendar</h2>
+    <p class="lede">Special dates, trips, and plans. Tap a day to see or add what’s happening.</p>
+
+    <div class="cal-bar">
+      <h3 id="cal-title">Month</h3>
+      <div class="cal-nav">
+        <button type="button" id="cal-prev" aria-label="Previous month">‹</button>
+        <button type="button" id="cal-today">Today</button>
+        <button type="button" id="cal-next" aria-label="Next month">›</button>
+      </div>
+    </div>
+    <div class="cal-wrap"><div class="cal" id="cal-grid"></div></div>
+    <div class="legend">
+      <span class="cat-special">Special date</span><span class="cat-vacation">Vacation</span><span class="cat-datenight">Date night</span><span class="cat-family">Family</span><span class="cat-other">Other</span>
+    </div>
+
+    <h3 id="day-heading">Coming up</h3>
+    <div class="ev-list" id="ev-list"><div class="empty">Loading…</div></div>
+
+    <h3 id="ev-form-heading">Add to the calendar</h3>
+    <form class="compose" id="ev-form">
+      <label for="ev-title">What
+        <input id="ev-title" maxlength="140" placeholder="Anniversary, Spain trip, dinner at…" required>
+      </label>
+      <label for="ev-cat">Kind
+        <select id="ev-cat">
+          <option>Special date</option><option>Vacation</option><option>Date night</option><option>Family</option><option>Other</option>
+        </select>
+      </label>
+      <div class="grid2">
+        <label for="ev-start">Starts
+          <input id="ev-start" type="date" required>
+        </label>
+        <label for="ev-end">Ends (optional)
+          <input id="ev-end" type="date">
+        </label>
+      </div>
+      <label class="checkrow" for="ev-yearly"><input id="ev-yearly" type="checkbox"> Repeats every year (birthdays, anniversaries)</label>
+      <label for="ev-notes">Notes (optional)
+        <textarea id="ev-notes" maxlength="2000" placeholder="Flight times, reservation, ideas…"></textarea>
+      </label>
+      <div class="row">
+        <div class="status" id="ev-status" role="status"></div>
+        <div class="post-actions">
+          <button class="linkbtn" id="ev-delete" type="button" hidden>Delete</button>
+          <button class="linkbtn" id="ev-cancel" type="button" hidden>Cancel</button>
+          <button class="btn" id="ev-save" type="submit">Add as Larry</button>
+        </div>
+      </div>
+    </form>
+  </section>
 </div>
 
 <script>
@@ -249,7 +349,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s
   function show(id){tabs.forEach(t=>{const on=t.dataset.tab===id;t.setAttribute('aria-selected',on);document.getElementById(t.dataset.tab).hidden=!on;});}
   tabs.forEach(t=>t.addEventListener('click',()=>{show(t.dataset.tab);try{history.replaceState(null,'','#'+t.dataset.tab);}catch(e){}}));
   const h=(location.hash||'').slice(1);
-  show(['promises','sotu','board'].includes(h)?h:'promises');
+  show(['promises','sotu','board','calendar'].includes(h)?h:'promises');
 
   // storage helpers
   const get=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
@@ -263,7 +363,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s
   let me=get('who')==='Liz'?'Liz':'Larry';
   const whoBtns=[...document.querySelectorAll('.who button')];
   let posts=[];
-  function setWho(w){me=w;whoBtns.forEach(b=>b.setAttribute('aria-pressed',b.dataset.who===w));$('post-btn').textContent='Post as '+w;put('who',w);if(posts.length)render(posts);}
+  function setWho(w){me=w;whoBtns.forEach(b=>b.setAttribute('aria-pressed',b.dataset.who===w));$('post-btn').textContent='Post as '+w;put('who',w);if(posts.length)render(posts);if(typeof calWho==='function')calWho();}
   whoBtns.forEach(b=>b.addEventListener('click',()=>setWho(b.dataset.who)));
   setWho(me);
 
@@ -295,6 +395,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s
         eb.addEventListener('click',()=>openEditor(art,p));
         actions.append(eb);art.append(actions);
       }
+      if(p.id) art.append(repliesBlock(p));
       feed.append(art);
     }
   }
@@ -371,11 +472,77 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s
     files.slice(0,MAX_FILES).forEach(f=>fl.append(el('div',null,'• '+f.name+' ('+Math.max(1,Math.round(f.size/1024))+' KB)')));
   });
 
+
+  // ----- replies -----
+  async function send(payload){
+    const r=await fetch(API_URL,{method:'POST',body:JSON.stringify(payload)});
+    return r.json();
+  }
+  function repliesBlock(p){
+    const box=el('div','replies');
+    const list=Array.isArray(p.replies)?p.replies:[];
+    for(const r of list){
+      const a=r.author==='Liz'?'Liz':'Larry';
+      const item=el('div','reply '+a);
+      const head=el('div','reply-head');
+      head.append(el('b',null,a));
+      const w=new Date(r.date);head.append(el('span',null,isNaN(w)?'':fmt.format(w)+(r.edited?' · edited':'')));
+      const txt=el('p',null,r.body||'');
+      item.append(head,txt);
+      if(a===me&&r.id){
+        const eb=el('button','linkbtn','Edit');eb.type='button';
+        eb.addEventListener('click',()=>{
+          eb.remove();txt.remove();
+          item.append(replyForm(r.body,'Save',async(body,st)=>{
+            const j=await send({action:'editReply',id:r.id,author:me,body});
+            if(!j.ok) throw new Error(j.error==='not_author'?'Only the person who wrote this can edit it.':'Couldn’t save. Try again.');
+          },()=>render(posts)));
+        });
+        item.append(eb);
+      }
+      box.append(item);
+    }
+    const rb=el('button','linkbtn','Reply as '+me);rb.type='button';
+    rb.addEventListener('click',()=>{
+      rb.remove();
+      box.append(replyForm('','Send reply',async(body)=>{
+        const j=await send({action:'reply',postId:p.id,author:me,body});
+        if(!j.ok) throw new Error(j.error==='not_found'?'This post no longer exists. Reload the page.':'Couldn’t send. Try again.');
+        return j.emailed?'Sent. '+j.to+' has been emailed.':'Sent.';
+      },()=>render(posts)));
+    });
+    box.append(rb);
+    return box;
+  }
+  let replyN=0;
+  function replyForm(value,label,onSave,onCancel){
+    const f=el('form','reply-form');
+    const id='reply-'+(++replyN);
+    const lab=el('label',null,'Your reply');lab.htmlFor=id;
+    const ta=el('textarea');ta.id=id;ta.maxLength=10000;ta.value=value||'';ta.required=true;lab.append(ta);
+    const row=el('div','row');const st=el('div','status');st.setAttribute('role','status');
+    const acts=el('div','post-actions');
+    const c=el('button','linkbtn','Cancel');c.type='button';c.addEventListener('click',onCancel);
+    const sv=el('button','btn',label);sv.type='submit';
+    acts.append(c,sv);row.append(st,acts);f.append(lab,row);
+    f.addEventListener('submit',async ev=>{
+      ev.preventDefault();
+      const body=ta.value.trim();if(!body){status(st,'Write something first.','warn');return;}
+      sv.disabled=true;status(st,'Saving…');
+      try{const msg=await onSave(body,st);status(st,msg||'Saved.','ok');load().catch(()=>{});}
+      catch(e){status(st,e.message&&!/fetch|network/i.test(e.message)?e.message:'Couldn’t reach the board. Your text is still here.','warn');sv.disabled=false;}
+    });
+    setTimeout(()=>ta.focus(),0);
+    return f;
+  }
+
   async function load(){
     const r=await fetch(API_URL+'?action=list');
     const j=await r.json();
     if(!j.ok) throw new Error(j.error||'error');
     render(j.posts||[]);
+    events=Array.isArray(j.events)?j.events:[];
+    renderCalendar();
   }
 
   function boardError(msg){const feed=$('feed');feed.textContent='';const d=document.createElement('div');d.className='empty';d.textContent=msg;feed.append(d);}
@@ -405,6 +572,155 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s
     }catch(e){status(ps,'Couldn’t reach the board. Check your connection; your text is still here.','warn');}
     finally{btn.disabled=false;}
   });
+
+  // ----- calendar -----
+  let events=[];
+  const CATS={'Special date':'cat-special','Vacation':'cat-vacation','Date night':'cat-datenight','Family':'cat-family','Other':'cat-other'};
+  const catClass=c=>CATS[c]||'cat-other';
+  const pad=n=>String(n).padStart(2,'0');
+  const toUTC=s=>Date.UTC(+s.slice(0,4),+s.slice(5,7)-1,+s.slice(8,10));
+  const fromUTC=t=>{const d=new Date(t);return d.getUTCFullYear()+'-'+pad(d.getUTCMonth()+1)+'-'+pad(d.getUTCDate());};
+  const addDays=(s,n)=>fromUTC(toUTC(s)+n*864e5);
+  const diffDays=(a,b)=>Math.round((toUTC(b)-toUTC(a))/864e5);
+  const now=new Date();const todayStr=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
+  const dayFmt=new Intl.DateTimeFormat(undefined,{weekday:'short',month:'short',day:'numeric',timeZone:'UTC'});
+  const dayFmtY=new Intl.DateTimeFormat(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric',timeZone:'UTC'});
+  const monthFmt=new Intl.DateTimeFormat(undefined,{month:'long',year:'numeric',timeZone:'UTC'});
+  const nice=s=>(s.slice(0,4)===todayStr.slice(0,4)?dayFmt:dayFmtY).format(new Date(toUTC(s)));
+  var viewY=now.getFullYear(), viewM=now.getMonth(), selDay=null, editingId=null;
+
+  function instances(from,to){
+    const out=[];
+    for(const ev of events){
+      if(!ev.yearly){ if(ev.start<=to&&ev.end>=from) out.push({ev,start:ev.start,end:ev.end}); continue; }
+      const span=Math.max(0,diffDays(ev.start,ev.end)), y0=+ev.start.slice(0,4);
+      for(let y=+from.slice(0,4)-1;y<=+to.slice(0,4);y++){
+        if(y<y0) continue;
+        const st=fromUTC(Date.UTC(y,+ev.start.slice(5,7)-1,+ev.start.slice(8,10)));
+        const en=addDays(st,span);
+        if(st<=to&&en>=from) out.push({ev,start:st,end:en});
+      }
+    }
+    return out.sort((a,b)=>a.start<b.start?-1:a.start>b.start?1:a.ev.title.localeCompare(b.ev.title));
+  }
+
+  function renderCalendar(){
+    const grid=$('cal-grid');if(!grid) return;
+    grid.textContent='';
+    $('cal-title').textContent=monthFmt.format(new Date(Date.UTC(viewY,viewM,1)));
+    ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>grid.append(el('div','dow',d)));
+    const first=fromUTC(Date.UTC(viewY,viewM,1));
+    const startDow=new Date(toUTC(first)).getUTCDay();
+    const gridStart=addDays(first,-startDow);
+    const daysInMonth=new Date(Date.UTC(viewY,viewM+1,0)).getUTCDate();
+    const cells=Math.ceil((startDow+daysInMonth)/7)*7;
+    const gridEnd=addDays(gridStart,cells-1);
+    const inst=instances(gridStart,gridEnd);
+    for(let i=0;i<cells;i++){
+      const d=addDays(gridStart,i);
+      const b=el('button','day');b.type='button';
+      if(+d.slice(5,7)-1!==viewM) b.classList.add('out');
+      if(d===todayStr) b.classList.add('today');
+      if(d===selDay) b.classList.add('sel');
+      b.append(el('span','n',String(+d.slice(8,10))));
+      const here=inst.filter(x=>x.start<=d&&x.end>=d);
+      here.slice(0,2).forEach(x=>{const c=el('span','chip '+catClass(x.ev.category),x.ev.title);b.append(c);});
+      if(here.length>2) b.append(el('span','more','+'+(here.length-2)+' more'));
+      b.setAttribute('aria-label',nice(d)+(here.length?', '+here.length+' event'+(here.length>1?'s':''):''));
+      b.addEventListener('click',()=>{selDay=selDay===d?null:d;if(!editingId&&selDay) $('ev-start').value=selDay;renderCalendar();});
+      grid.append(b);
+    }
+    renderEventList();
+  }
+
+  function gcalLink(ev,st,en){
+    const q=new URLSearchParams({action:'TEMPLATE',text:ev.title,dates:st.replace(/-/g,'')+'/'+addDays(en,1).replace(/-/g,''),details:ev.notes||''});
+    if(ev.yearly) q.set('recur','RRULE:FREQ=YEARLY');
+    return 'https://calendar.google.com/calendar/render?'+q.toString();
+  }
+
+  function eventCard(x){
+    const ev=x.ev, card=el('article','ev '+catClass(ev.category));
+    const when=x.start===x.end?nice(x.start):nice(x.start)+' – '+nice(x.end);
+    const w=el('div','when',when+(ev.yearly?' · every year':''));
+    let cd='';
+    if(x.start<=todayStr&&x.end>=todayStr) cd=x.start===x.end?'Today':'Happening now';
+    else if(x.start>todayStr){const n=diffDays(todayStr,x.start);cd=n===1?'Tomorrow':'In '+n+' days';}
+    if(cd){w.append(' · ');w.append(el('span','countdown',cd));}
+    card.append(w,el('div','t',ev.title),el('div','meta',ev.category+' · added by '+(ev.addedBy||'—')));
+    if(ev.notes) card.append(el('p','notes',ev.notes));
+    const acts=el('div','acts');
+    const e=el('button','linkbtn','Edit');e.type='button';e.addEventListener('click',()=>startEdit(ev));
+    const g=el('a',null,'Add to Google Calendar');g.href=gcalLink(ev,ev.yearly?x.start:ev.start,ev.yearly?x.end:ev.end);g.target='_blank';g.rel='noopener';
+    acts.append(e,g);card.append(acts);
+    return card;
+  }
+
+  function renderEventList(){
+    const list=$('ev-list');list.textContent='';
+    if(selDay){
+      $('day-heading').textContent=nice(selDay);
+      const here=instances(selDay,selDay);
+      if(!here.length) list.append(el('div','empty','Nothing on this day yet. Use the form below to add something.'));
+      here.forEach(x=>list.append(eventCard(x)));
+      return;
+    }
+    $('day-heading').textContent='Coming up';
+    const seen=new Set();
+    const up=instances(todayStr,addDays(todayStr,366)).filter(x=>x.end>=todayStr&&!seen.has(x.ev.id)&&seen.add(x.ev.id)).slice(0,8);
+    if(!up.length){list.append(el('div','empty','Nothing planned yet. Add your first special date below.'));return;}
+    up.forEach(x=>list.append(eventCard(x)));
+  }
+
+  function calWho(){ if(!editingId) $('ev-save').textContent='Add as '+me; }
+  function resetEventForm(){
+    editingId=null;$('ev-form').reset();$('ev-start').value=selDay||todayStr;
+    $('ev-form-heading').textContent='Add to the calendar';
+    $('ev-delete').hidden=true;$('ev-cancel').hidden=true;$('ev-delete').textContent='Delete';calWho();
+  }
+  function startEdit(ev){
+    editingId=ev.id;
+    $('ev-title').value=ev.title;$('ev-cat').value=ev.category;$('ev-start').value=ev.start;
+    $('ev-end').value=ev.end!==ev.start?ev.end:'';$('ev-yearly').checked=!!ev.yearly;$('ev-notes').value=ev.notes||'';
+    $('ev-form-heading').textContent='Edit: '+ev.title;
+    $('ev-save').textContent='Save changes';$('ev-delete').hidden=false;$('ev-cancel').hidden=false;
+    status($('ev-status'),'');
+    $('ev-form-heading').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  $('cal-prev').addEventListener('click',()=>{viewM--;if(viewM<0){viewM=11;viewY--;}renderCalendar();});
+  $('cal-next').addEventListener('click',()=>{viewM++;if(viewM>11){viewM=0;viewY++;}renderCalendar();});
+  $('cal-today').addEventListener('click',()=>{viewY=now.getFullYear();viewM=now.getMonth();selDay=null;renderCalendar();});
+  $('ev-cancel').addEventListener('click',()=>{resetEventForm();status($('ev-status'),'');});
+  $('ev-delete').addEventListener('click',async()=>{
+    const b=$('ev-delete'),st=$('ev-status');
+    if(b.textContent==='Delete'){b.textContent='Tap again to delete';return;}
+    b.disabled=true;status(st,'Deleting…');
+    try{const j=await send({action:'deleteEvent',id:editingId,author:me});
+      if(!j.ok) throw new Error('x');
+      resetEventForm();status(st,'Deleted.','ok');load().catch(()=>{});}
+    catch(e){status(st,'Couldn’t delete. Try again.','warn');}
+    finally{b.disabled=false;}
+  });
+  $('ev-form').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const st=$('ev-status'),btn=$('ev-save');
+    const event={title:$('ev-title').value.trim(),category:$('ev-cat').value,start:$('ev-start').value,
+      end:$('ev-end').value||$('ev-start').value,yearly:$('ev-yearly').checked,notes:$('ev-notes').value.trim()};
+    if(!event.title||!event.start){status(st,'Add a title and a start date.','warn');return;}
+    if(event.end<event.start){status(st,'The end date is before the start date.','warn');return;}
+    btn.disabled=true;status(st,'Saving…');
+    try{
+      const j=await send(editingId?{action:'editEvent',id:editingId,author:me,event}:{action:'addEvent',author:me,event});
+      if(!j.ok){status(st,j.message||(j.error==='not_found'?'That event was removed. Reload the page.':'Couldn’t save. Try again.'),'warn');return;}
+      const wasEdit=!!editingId;
+      resetEventForm();
+      status(st,wasEdit?'Saved.':(j.emailed?'Added. '+j.to+' has been emailed.':'Added.'),'ok');
+      const y=+event.start.slice(0,4),m=+event.start.slice(5,7)-1;viewY=y;viewM=m;
+      load().catch(()=>{});
+    }catch(err){status(st,'Couldn’t reach the calendar. Your details are still here.','warn');}
+    finally{btn.disabled=false;}
+  });
+  calWho();$('ev-start').value=todayStr;renderCalendar();
 })();
 </script>
 
