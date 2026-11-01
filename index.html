@@ -323,6 +323,14 @@ input[type=file]{padding:8px}
           <input id="ev-end" type="date">
         </label>
       </div>
+      <div class="grid2">
+        <label for="ev-time">Start time (optional)
+          <input id="ev-time" type="time">
+        </label>
+        <label for="ev-endtime">End time (optional)
+          <input id="ev-endtime" type="time">
+        </label>
+      </div>
       <label class="checkrow" for="ev-yearly"><input id="ev-yearly" type="checkbox"> Repeats every year (birthdays, anniversaries)</label>
       <label for="ev-notes">Notes (optional)
         <textarea id="ev-notes" maxlength="2000" placeholder="Flight times, reservation, ideas…"></textarea>
@@ -589,6 +597,8 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s
   const nice=s=>(s.slice(0,4)===todayStr.slice(0,4)?dayFmt:dayFmtY).format(new Date(toUTC(s)));
   var viewY=now.getFullYear(), viewM=now.getMonth(), selDay=null, editingId=null;
 
+  const niceTime=t=>{if(!t)return '';let h=+t.slice(0,2);const m=t.slice(3,5),ap=h<12?'AM':'PM';h=h%12||12;return h+':'+m+' '+ap;};
+  const shortTime=t=>{if(!t)return '';let h=+t.slice(0,2);const m=t.slice(3,5),ap=h<12?'a':'p';h=h%12||12;return h+(m==='00'?'':':'+m)+ap;};
   function instances(from,to){
     const out=[];
     for(const ev of events){
@@ -601,7 +611,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s
         if(st<=to&&en>=from) out.push({ev,start:st,end:en});
       }
     }
-    return out.sort((a,b)=>a.start<b.start?-1:a.start>b.start?1:a.ev.title.localeCompare(b.ev.title));
+    return out.sort((a,b)=>a.start<b.start?-1:a.start>b.start?1:(a.ev.time||'')<(b.ev.time||'')?-1:(a.ev.time||'')>(b.ev.time||'')?1:a.ev.title.localeCompare(b.ev.title));
   }
 
   function renderCalendar(){
@@ -624,7 +634,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s
       if(d===selDay) b.classList.add('sel');
       b.append(el('span','n',String(+d.slice(8,10))));
       const here=inst.filter(x=>x.start<=d&&x.end>=d);
-      here.slice(0,2).forEach(x=>{const c=el('span','chip '+catClass(x.ev.category),x.ev.title);b.append(c);});
+      here.slice(0,2).forEach(x=>{const c=el('span','chip '+catClass(x.ev.category),(x.ev.time&&x.start===d?shortTime(x.ev.time)+' ':'')+x.ev.title);b.append(c);});
       if(here.length>2) b.append(el('span','more','+'+(here.length-2)+' more'));
       b.setAttribute('aria-label',nice(d)+(here.length?', '+here.length+' event'+(here.length>1?'s':''):''));
       b.addEventListener('click',()=>{selDay=selDay===d?null:d;if(!editingId&&selDay) $('ev-start').value=selDay;renderCalendar();});
@@ -634,14 +644,24 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s
   }
 
   function gcalLink(ev,st,en){
-    const q=new URLSearchParams({action:'TEMPLATE',text:ev.title,dates:st.replace(/-/g,'')+'/'+addDays(en,1).replace(/-/g,''),details:ev.notes||''});
+    let dates;
+    if(ev.time){
+      // Timed event: no end time = 1 hour long
+      let et=ev.endTime, ed=en;
+      if(!et){const h=+ev.time.slice(0,2)+1;et=pad(h%24)+ev.time.slice(2);if(h>=24&&ed===st)ed=addDays(st,1);}
+      else if(ed===st&&et<=ev.time) ed=addDays(st,1);
+      const stamp=(d,t)=>d.replace(/-/g,'')+'T'+t.replace(':','')+'00';
+      dates=stamp(st,ev.time)+'/'+stamp(ed,et);
+    }else dates=st.replace(/-/g,'')+'/'+addDays(en,1).replace(/-/g,'');
+    const q=new URLSearchParams({action:'TEMPLATE',text:ev.title,dates,details:ev.notes||'',ctz:Intl.DateTimeFormat().resolvedOptions().timeZone||'America/New_York'});
     if(ev.yearly) q.set('recur','RRULE:FREQ=YEARLY');
     return 'https://calendar.google.com/calendar/render?'+q.toString();
   }
 
   function eventCard(x){
     const ev=x.ev, card=el('article','ev '+catClass(ev.category));
-    const when=x.start===x.end?nice(x.start):nice(x.start)+' – '+nice(x.end);
+    const clock=ev.time?' · '+niceTime(ev.time)+(ev.endTime?' – '+niceTime(ev.endTime):''):'';
+    const when=(x.start===x.end?nice(x.start):nice(x.start)+' – '+nice(x.end))+clock;
     const w=el('div','when',when+(ev.yearly?' · every year':''));
     let cd='';
     if(x.start<=todayStr&&x.end>=todayStr) cd=x.start===x.end?'Today':'Happening now';
@@ -681,7 +701,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s
   function startEdit(ev){
     editingId=ev.id;
     $('ev-title').value=ev.title;$('ev-cat').value=ev.category;$('ev-start').value=ev.start;
-    $('ev-end').value=ev.end!==ev.start?ev.end:'';$('ev-yearly').checked=!!ev.yearly;$('ev-notes').value=ev.notes||'';
+    $('ev-end').value=ev.end!==ev.start?ev.end:'';$('ev-time').value=ev.time||'';$('ev-endtime').value=ev.endTime||'';$('ev-yearly').checked=!!ev.yearly;$('ev-notes').value=ev.notes||'';
     $('ev-form-heading').textContent='Edit: '+ev.title;
     $('ev-save').textContent='Save changes';$('ev-delete').hidden=false;$('ev-cancel').hidden=false;
     status($('ev-status'),'');
@@ -705,7 +725,9 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s
     e.preventDefault();
     const st=$('ev-status'),btn=$('ev-save');
     const event={title:$('ev-title').value.trim(),category:$('ev-cat').value,start:$('ev-start').value,
-      end:$('ev-end').value||$('ev-start').value,yearly:$('ev-yearly').checked,notes:$('ev-notes').value.trim()};
+      end:$('ev-end').value||$('ev-start').value,yearly:$('ev-yearly').checked,notes:$('ev-notes').value.trim(),
+      time:$('ev-time').value,endTime:$('ev-time').value?$('ev-endtime').value:''};
+    if(!event.time&&$('ev-endtime').value){status(st,'Add a start time, or clear the end time.','warn');return;}
     if(!event.title||!event.start){status(st,'Add a title and a start date.','warn');return;}
     if(event.end<event.start){status(st,'The end date is before the start date.','warn');return;}
     btn.disabled=true;status(st,'Saving…');
