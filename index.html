@@ -128,6 +128,12 @@ input[type=file]{padding:8px}
 .replies>.linkbtn{justify-self:start}
 .reply .linkbtn{justify-self:start;padding:3px 10px;font-size:13px}
 .reply-form{display:grid;gap:8px}
+.reacts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.react{font:inherit;font-size:13px;display:inline-flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:3px 10px;cursor:pointer;min-height:30px}
+.react .e{font-size:15px;line-height:1}
+.react[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.react:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.reply .reacts{margin-top:2px}
 .reply-form textarea{min-height:80px}
 /* calendar */
 .cat-special{--c:var(--accent)} .cat-vacation{--c:var(--liz)} .cat-datenight{--c:var(--c-date)} .cat-family{--c:var(--c-family)} .cat-other{--c:var(--muted)}
@@ -410,6 +416,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s
       const h4=el('h4',null,p.title||'Untitled');
       const b=el('p',null,p.body||'');
       art.append(hd,h4,b);
+      if(p.id) art.append(reactBar(p));
       if(Array.isArray(p.files)&&p.files.length) art.append(attachments(p.files));
       if(p.id && a===me){
         const actions=el('div','post-actions');
@@ -495,6 +502,32 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s
   });
 
 
+  // ----- reactions -----
+  const REACT_EMOJI={heart:'❤️',thumbs:'👍'}, REACT_LABEL={heart:'Love',thumbs:'Thumbs up'};
+  function reactBar(target){
+    const bar=el('div','reacts');
+    const list=Array.isArray(target.reactions)?target.reactions:[];
+    for(const type of ['heart','thumbs']){
+      const who=list.filter(x=>x.type===type).map(x=>x.author==='Liz'?'Liz':'Larry');
+      const mine=who.includes(me);
+      const b=el('button','react');b.type='button';
+      b.setAttribute('aria-pressed',String(mine));
+      b.append(el('span','e',REACT_EMOJI[type]));
+      if(who.length) b.append(el('span',null,who.join(' & ')));
+      b.setAttribute('aria-label',REACT_LABEL[type]+(who.length?', from '+who.join(' and '):''));
+      b.addEventListener('click',async()=>{
+        // update right away, then save
+        const idx=list.findIndex(x=>x.type===type&&x.author===me);
+        if(idx>=0) list.splice(idx,1); else list.push({type,author:me});
+        target.reactions=list;bar.replaceWith(reactBar(target));
+        try{const j=await send({action:'react',id:target.id,author:me,type});if(!j.ok) throw 0;}
+        catch(e){load().catch(()=>{});}
+      });
+      bar.append(b);
+    }
+    return bar;
+  }
+
   // ----- replies -----
   async function send(payload){
     const r=await fetch(API_URL,{method:'POST',body:JSON.stringify(payload)});
@@ -511,6 +544,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s
       const w=new Date(r.date);head.append(el('span',null,isNaN(w)?'':fmt.format(w)+(r.edited?' · edited':'')));
       const txt=el('p',null,r.body||'');
       item.append(head,txt);
+      if(r.id) item.append(reactBar(r));
       if(a===me&&r.id){
         const eb=el('button','linkbtn','Edit');eb.type='button';
         eb.addEventListener('click',()=>{
