@@ -352,6 +352,20 @@ input[type=file]{padding:8px}
 const API_URL = 'https://script.google.com/macros/s/AKfycbzNEJ_386sO8wCYSbHtaY1s9I7eEjvrUE2vcadP7xrj2Zf8qVSu4IyuTPir5jVUgU6i/exec';
 
 (function(){
+  // Shared-file link from an email: report the click, then open the file
+  if((function(){
+    let q;try{q=new URLSearchParams(location.search);}catch(e){return false;}
+    const go=q.get('go'), id=q.get('e');
+    if(!go||!/^https:\/\/(docs|drive)\.google\.com\//.test(go)) return false;
+    document.body.innerHTML='<p style="font-family:system-ui,sans-serif;padding:32px 16px;color:#6C6475">Opening file…</p>';
+    const done=()=>location.replace(go);
+    const t=setTimeout(done,2000);
+    try{
+      fetch(API_URL,{method:'POST',keepalive:true,body:JSON.stringify({action:'opened',e:id||'',n:q.get('n')||''})})
+        .catch(()=>{}).finally(()=>{clearTimeout(t);done();});
+    }catch(e){clearTimeout(t);done();}
+    return true;
+  })()) return;
   // tabs
   const tabs=[...document.querySelectorAll('nav [role=tab]')];
   function show(id){tabs.forEach(t=>{const on=t.dataset.tab===id;t.setAttribute('aria-selected',on);document.getElementById(t.dataset.tab).hidden=!on;});}
